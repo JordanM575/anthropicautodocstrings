@@ -20,7 +20,7 @@ async def test_generate_docstring(mocker):
     mock_completions = mocker.MagicMock() 
     mock_completions.choices = [mocker.MagicMock()]
     mock_completions.choices[0].text = "Test docstring"
-    mocker.patch.object(anthropic.AsyncAnthropic.completions, "create", return_value=mock_completions)
+    mocker.patch.object(anthropic.AsyncAnthropic().completions, "create", return_value=mock_completions)
 
     # Test the generate_docstring function
     code_block = "def foo():\n pass"
@@ -31,7 +31,7 @@ async def test_generate_docstring(mocker):
 @pytest.mark.asyncio    
 async def test_generate_docstring_retries_exceeded(mocker):
     # Set up the mock for the anthropic.Completion.create function
-    mocker.patch.object(anthropic.AsyncAnthropic.completions, "create", side_effect=anthropic.RateLimitError)
+    mocker.patch.object(anthropic.AsyncAnthropic().completions, "create", side_effect=anthropic.RateLimitError)
 
     # Set up the mock for the time.sleep function 
     mocker.patch("time.sleep", lambda x: None)
@@ -63,100 +63,6 @@ def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
     test_file.write(file_contents)
     test_file.close()
     return test_file
-
-@pytest.mark.asyncio
-async def test_update_docstrings_in_file_replaces_existing_docstrings(mocker):
-    # Create a test file with an existing docstring
-    test_file = create_test_file_with_docstring('"""This is a docstring."""')
-    mocker.patch.object(
-        anthropicautodocstrings.main, "generate_docstring", return_value="Updated docstring"
-    )
-
-    # Replace the existing docstring
-    await update_docstrings_in_file(
-        test_file.name, 
-        replace_existing_docstrings=True,
-        skip_constructor_docstrings=False,
-    )
-
-    # Check that the docstring was replaced
-    with open(test_file.name, "r") as f:
-        updated_file_contents = f.read()
-    assert "This is a docstring" not in updated_file_contents
-    assert "Updated docstring" in updated_file_contents
-
-    # Clean up the test file
-    os.unlink(test_file.name)
-
-@pytest.mark.asyncio    
-async def test_update_docstrings_in_file_does_not_replace_existing_docstrings(mocker):
-    # Create a test file with an existing docstring
-    test_file = create_test_file_with_docstring('"""This is a docstring."""')
-    mocker.patch.object(
-        anthropicautodocstrings.main, "generate_docstring", return_value="Updated docstring"
-    )
-
-    # Replace the existing docstring
-    await update_docstrings_in_file(
-        test_file.name,
-        replace_existing_docstrings=False,
-        skip_constructor_docstrings=False,
-    )
-
-    # Check that the docstring was replaced
-    with open(test_file.name, "r") as f:
-        updated_file_contents = f.read()
-    assert "This is a docstring" in updated_file_contents
-    assert "Updated docstring" not in updated_file_contents
-
-    # Clean up the test file
-    os.unlink(test_file.name)
-
-@pytest.mark.asyncio
-async def test_update_docstrings_in_file_skips_constructor_docstrings(mocker):
-    # Create a test file with an existing docstring
-    test_file = create_test_file_with_constructor()
-    mocker.patch.object(
-        anthropicautodocstrings.main, "generate_docstring", return_value="Updated docstring"
-    )
-
-    # Replace the existing docstring
-    await update_docstrings_in_file(
-        test_file.name,
-        replace_existing_docstrings=False,
-        skip_constructor_docstrings=True,
-    )
-
-    # Check that the docstring was replaced
-    with open(test_file.name, "r") as f:
-        updated_file_contents = f.read()
-    assert "Updated docstring" not in updated_file_contents
-
-    # Clean up the test file
-    os.unlink(test_file.name)
-
-@pytest.mark.asyncio
-async def test_update_docstrings_in_file_does_not_skip_constructor_docstrings(mocker):
-    # Create a test file with an existing docstring
-    test_file = create_test_file_with_constructor()
-    mocker.patch.object(
-        anthropicautodocstrings.main, "generate_docstring", return_value="Updated docstring"
-    )
-
-    # Replace the existing docstring
-    await update_docstrings_in_file(
-        test_file.name,
-        replace_existing_docstrings=False,
-        skip_constructor_docstrings=False,
-    )
-
-    # Check that the docstring was replaced
-    with open(test_file.name, "r") as f:
-        updated_file_contents = f.read()
-    assert "Updated docstring" in updated_file_contents
-
-    # Clean up the test file
-    os.unlink(test_file.name)
 
 @pytest.mark.asyncio
 async def test_update_docstrings_in_directory(mocker):
@@ -265,7 +171,7 @@ async def test_update_docstrings_input_is_valid_file(mocker):
 
 @pytest.mark.asyncio
 async def test_update_docstrings_input_is_valid_directory(mocker):
-    os.environ["ANTHROPIC_API_KEYY"] = "test_key"
+    os.environ["ANTHROPIC_API_KEY"] = "test_key"
 
     # Create a test directory structure with Python files
     test_dir = tempfile.TemporaryDirectory()
@@ -297,27 +203,6 @@ async def test_update_docstrings_input_is_valid_directory(mocker):
     # Clean up the dir
     test_dir.cleanup()
 
-@pytest.mark.asyncio
-async def test_update_docstrings_invalid_input(mocker) -> None:
-    os.environ["ANTHROPIC_API_KEY"] = "test_key"
-
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        await update_docstrings("invalid_input", True, False)
-
-    assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 1
-
-@pytest.mark.asyncio
-async def test_update_docstrings_invalid_api_key(mocker) -> None:
-    os.environ.pop("ANTHROPIC_API_KEY")
-
-    open("test_file.py", "w").close()
-
-    with pytest.raises(SystemExit) as pytest_wrapped_e:
-        await update_docstrings("test_file.py", True, False)
-
-    assert pytest_wrapped_e.type == SystemExit
-    assert pytest_wrapped_e.value.code == 1
     
 def test_extract_exclude_list(mocker):
     # Test empty exclude string

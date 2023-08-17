@@ -18,11 +18,8 @@ from anthropic import (
     RateLimitError,
     APITimeoutError)
 
-try:
-    anthropic = AsyncAnthropic()
-except KeyError:
-    typer.secho("Error: ANTRHOPIC_API_KEY environment variable not set!", fg=typer.colors.RED)
-    sys.exit(1)
+anthropic = AsyncAnthropic()
+
 
 BASE_DIR = ''
 
@@ -78,14 +75,14 @@ async def generate_docstring(code_block: str, block_name: str):
         except RateLimitError:
             # Handle rate limiting error
             typer.secho(
-                f"####### Anthropic rate limit reached, waiting for 1 minute #######",
+                "####### Anthropic rate limit reached, waiting for 1 minute #######",
                 fg=typer.colors.YELLOW,
             )
             time.sleep(60)  # Wait 1 minute before trying again
             retries += 1  # Increment the number of retries
     if retries == max_retries:
         typer.secho(
-            f"Maximum number of retries exceeded. Giving up.",
+            "Maximum number of retries exceeded. Giving up.",
             fg=typer.colors.RED,
         )
         sys.exit(1)
@@ -138,6 +135,13 @@ async def update_docstrings_in_directory(directory: str, replace_existing_docstr
 
 
 async def update_docstrings(input: str, replace_existing_docstrings: bool, skip_constructor_docstrings: bool, exclude_directories: List[str] = [], exclude_files: List[str] = []) -> None:
+    try:
+        anthropic.api_key = os.environ["ANTHROPIC_API_KEY"]
+    except TypeError:
+        typer.secho("ANTHROPIC_API_KEY environment variable not set!", fg=typer.colors.RED)
+        sys.exit(1)
+
+    
     if os.path.isfile(input) and input.endswith(".py"):
         if os.path.basename(input) in exclude_files:
             return
