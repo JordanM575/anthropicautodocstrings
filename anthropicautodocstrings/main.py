@@ -18,8 +18,32 @@ from anthropic import (
     RateLimitError,
     APITimeoutError,
 )
+import dotenv
 
-anthropic = AsyncAnthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+# Load .env file if it exists
+dotenv.load_dotenv()
+
+# Get ANTHROPIC_API_KEY from environment
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+
+# If not available in environment, ask user for it
+if not ANTHROPIC_API_KEY:
+    confirmation = input("ANTHROPIC_API_KEY not found. Would you like to enter it now? (yes or no) ").lower()
+    
+    if confirmation == "yes":
+        ANTHROPIC_API_KEY = input("Please enter your ANTHROPIC_API_KEY: ")
+        
+        # Save the key to .env file
+        with open(".env", "a") as env_file:
+            env_file.write(f"\nANTHROPIC_API_KEY={ANTHROPIC_API_KEY}\n")
+            
+        # Load the newly added environment variable
+        dotenv.load_dotenv()
+    else:
+        typer.secho("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+        sys.exit(1)
+
+anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
 BASE_DIR = ""
 
 
