@@ -18,31 +18,71 @@ from anthropic import (
     RateLimitError,
     APITimeoutError,
 )
-import dotenv
+import platform
 
-# Load .env file if it exists
-dotenv.load_dotenv()
 
-# Get ANTHROPIC_API_KEY from environment
+def set_env_variable_linux(var_name, value):
+    """
+    set_env_variable_linux(var_name: str, value: str)
+
+        Set environment variable on Linux systems by writing to ~/.bashrc.
+
+        Parameters:
+            var_name: The name of the environment variable to set
+            value: The value to set the variable to
+
+        Raises:
+            FileNotFoundError: If ~/.bashrc cannot be found
+
+        Writes the export statement for the given variable name and value pair
+        to the ~/.bashrc file. Prints a message informing the user that they
+        must restart their terminal or source the file for the change to take effect.
+    """
+    with open(f"{os.path.expanduser('~')}/.bashrc", "a") as f:
+        f.write(f'\nexport {var_name}="{value}"\n')
+    print(
+        f"Added {var_name} to .bashrc. Restart the terminal or run 'source ~/.bashrc' to load the new variable."
+    )
+
+
+def set_env_variable_windows(var_name, value):
+    """
+
+    def set_env_variable_windows(var_name: str, value: str):
+            Sets an environment variable on Windows.
+
+            Parameters:
+                var_name (str): Name of the environment variable to set.
+                value (str): Value to set the environment variable to.
+
+            Exceptions:
+                Raises exceptions from the os.system call.
+
+            Returns:
+                None
+    """
+    os.system(f'set {var_name}="{value}"')
+
+
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-
-# If not available in environment, ask user for it
 if not ANTHROPIC_API_KEY:
-    confirmation = input("ANTHROPIC_API_KEY not found. Would you like to enter it now? (yes or no) ").lower()
-    
+    confirmation = input(
+        "ANTHROPIC_API_KEY not found. Would you like to enter it now? (yes or no) "
+    ).lower()
     if confirmation == "yes":
         ANTHROPIC_API_KEY = input("Please enter your ANTHROPIC_API_KEY: ")
-        
-        # Save the key to .env file
-        with open(".env", "a") as env_file:
-            env_file.write(f"\nANTHROPIC_API_KEY={ANTHROPIC_API_KEY}\n")
-            
-        # Load the newly added environment variable
-        dotenv.load_dotenv()
+        os_type = platform.system().lower()
+        if os_type == "linux" or os_type == "debian":
+            set_env_variable_linux("ANTHROPIC_API_KEY", ANTHROPIC_API_KEY)
+            os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
+        elif os_type == "windows":
+            set_env_variable_windows("ANTHROPIC_API_KEY", ANTHROPIC_API_KEY)
+            os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
+        else:
+            print("Unrecognized system. Manually set the environment variable ANTHROPIC_API_KEY.")
     else:
-        typer.secho("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+        print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
         sys.exit(1)
-
 anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
 BASE_DIR = ""
 
@@ -214,21 +254,16 @@ def _extract_exclude_list(exclude: str) -> List[str]:
 
     _extract_exclude_list(exclude: str) -> List[str]
 
-        Extracts a list of excluded items from a comma separated string.
+        Extract a list of excluded items from a comma-separated string.
 
         Parameters:
-            exclude: str
-                The comma separated string of excluded items.
+            exclude (str): A comma-separated string of excluded items.
 
         Returns:
-            List[str]:
-                A list containing the excluded items stripped of whitespace.
+            List[str]: A list of excluded items, excluding any empty strings.
 
         Raises:
             None
-
-        This function takes a comma separated string of excluded items and returns
-        a list containing the same items stripped of any surrounding whitespace.
     """
     return [x.strip() for x in exclude.split(",") if x.strip() != ""]
 
@@ -254,14 +289,16 @@ async def main() -> None:
 
 def run():
     """
-    main()
+    run()
+            Runs the main coroutine.
 
-            This function is the entry point for the program. It calls the async function run().
+            Parameters:
+                None
 
             Returns:
                 None
 
             Raises:
-                asyncio.CancelledError: if the task is cancelled.
+                None
     """
     asyncio.run(main())

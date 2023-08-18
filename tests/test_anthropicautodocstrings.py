@@ -14,13 +14,18 @@ from anthropicautodocstrings.main import (
 
 def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile:
     """
-    Creates a temporary test file with the given docstring
+    create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile
 
-            Parameters:
-                docstring (str): The docstring to include in the test file
+    Creates a temporary file containing a function with the given docstring. The file is returned as a NamedTemporaryFile instance.
 
-            Returns:
-                tempfile.NamedTemporaryFile: A file object for the test file
+    Parameters:
+        docstring: str
+            The docstring to include in the temporary file
+
+    Returns:
+            tempfile.NamedTemporaryFile
+                A file-like object representing the temporary file created, which must be closed by the caller.
+
     """
     file_contents = f"\ndef foo():\n{docstring}\npass\n"
     test_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -31,19 +36,17 @@ def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFi
 
 def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
     """
-    create_test_file_with_constructor() -> tempfile.NamedTemporaryFile
 
-            Creates a test file with a constructor that does nothing.
-
-            Parameters:
-                None
-
-            Returns:
-                tempfile.NamedTemporaryFile: A temporary file object with the given file
-                    contents that will be cleaned up on interpreter exit.
-
-            Exceptions:
-                None
+    def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
+        Create a test file with constructor.
+        Create a temporary NamedTemporaryFile to contain some file contents and return it without deleting.
+        Parameters:
+            None
+        Returns:
+            tempfile.NamedTemporaryFile: Returns the test file object without deleting it.
+        Raises:
+            None
+        File_contents is written to a NamedTemporaryFile which is returned without deleting. This allows the contents to be accessed later for testing.
     """
     file_contents = """
     def __init__():
@@ -161,24 +164,17 @@ async def test_update_docstrings_input_is_valid_directory(mocker):
 
 def test_extract_exclude_list(mocker):
     """
-    test_extract_exclude_list(mocker)
-            Tests the _extract_exclude_list function.
+    test_extract_exclude_list(mocker):
+            Extract exclude list from a string.
 
-            Parameters:
-                mocker: Fixture for mocking functions
+            Arguments:
+                mocker: Mock object
 
             Returns:
-                None
+                list - List of excluded files
 
             Raises:
-                None
-
-            Examples:
-                The function tests:
-                - An empty string returns empty list
-                - A single filename returns a list with that filename
-                - Multiple filenames separated by commas returns a list of those filenames
-                - Handles whitespace surrounding filenames
+                No exceptions
     """
     assert _extract_exclude_list("") == []
     assert _extract_exclude_list("test.py") == ["test.py"]
