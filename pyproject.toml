@@ -19,7 +19,7 @@ pytest-cov = "^4.1.0"
 pytest-asyncio = "^0.21.1"
 
 [tool.poetry.scripts]
-aads = 'anthropicautodocstrings.cli:main'
+aads = 'anthropicautodocstrings.main:run'
 
 [build-system]
 requires = ["poetry-core"]
