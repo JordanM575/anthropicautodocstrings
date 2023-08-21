@@ -9,7 +9,7 @@ on:
         default: warning
 
 jobs:
-  build:
+  Build_And_Release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -39,7 +39,6 @@ jobs:
         with:
           tag: v${{ env.version }}
           message: Release ${{ env.version }}
-          
       - name: Create release
         uses: actions/github-script@v5
         with:
@@ -58,7 +57,11 @@ jobs:
             } catch (error) {
               core.setFailed(error.message);
             }
-          
-      - name: Publish to PyPI with Poetry
-        run: |
-          poetry publish --build -u __token__ -p ${{ secrets.PYPI_TOKEN }}
+  Publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build and publish to pypi
+        uses: JRubics/poetry-publish@v1.17
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
