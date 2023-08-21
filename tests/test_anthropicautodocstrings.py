@@ -9,6 +9,12 @@ from anthropicautodocstrings.main import (
     update_docstrings,
     _extract_exclude_list,
 )
+from unittest.mock import patch
+
+# Mock sys.exit so it doesn't interrupt the test session
+with patch('anthropicautodocstrings.main.sys.exit'):
+    import anthropicautodocstrings.main
+
 
 # Fixture to setup and cleanup API key
 @pytest.fixture(scope="function")

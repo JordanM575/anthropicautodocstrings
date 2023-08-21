@@ -55,20 +55,21 @@ def set_env_variable_windows(var_name, value) -> None:
                 None
     """
     os.system(f'set {var_name}="{value}"')
-try:
-    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-    anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
-    if not ANTHROPIC_API_KEY:
-        print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
-        sys.exit(1)
-except Exception:
-    print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
-    sys.exit(1)
+
 
 BASE_DIR = ""
 
 
 async def generate_docstring(code_block: str, block_name: str) -> str | None:
+    try:
+        ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+        anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+        if not ANTHROPIC_API_KEY:
+            print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+            sys.exit(1)
+    except Exception:
+        print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+        sys.exit(1)
     stripped_code_block = textwrap.dedent(code_block)
     model = "claude-instant-1.2"
     prompt = f"""
@@ -250,6 +251,9 @@ def _extract_exclude_list(exclude: str) -> List[str]:
 
 
 async def main() -> None:
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+        sys.exit(1)
     parser = argparse.ArgumentParser()
     parser.add_argument("input")
     parser.add_argument("--replace-existing-docstrings", action="store_true")
