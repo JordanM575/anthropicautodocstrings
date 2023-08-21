@@ -2,7 +2,6 @@ import pytest
 import os
 import tempfile
 import sys
-import anthropic
 import anthropicautodocstrings
 import anthropicautodocstrings.main
 from anthropicautodocstrings.main import (
@@ -81,7 +80,7 @@ async def test_update_docstrings_in_directory(mocker):
 
 
 @pytest.mark.asyncio
-async def test_update_docstrings_in_directory_with_exclude_files(mocker):
+async def test_update_docstrings_in_directory_with_exclude_files(mocker) -> None:
     test_dir = tempfile.TemporaryDirectory()
     file_1 = os.path.join(test_dir.name, "file_1.py")
     open(file_1, "w").close()
@@ -94,7 +93,7 @@ async def test_update_docstrings_in_directory_with_exclude_files(mocker):
 
 
 @pytest.mark.asyncio
-async def test_update_docstrings_in_directory_with_exclude_dirs(mocker):
+async def test_update_docstrings_in_directory_with_exclude_dirs(mocker) -> None:
     test_dir = tempfile.TemporaryDirectory()
     subdir_1 = os.path.join(test_dir.name, "subdir_1")
     os.makedirs(subdir_1)
@@ -109,7 +108,7 @@ async def test_update_docstrings_in_directory_with_exclude_dirs(mocker):
 
 
 @pytest.mark.asyncio
-async def test_update_docstrings_input_is_valid_file(mocker):
+async def test_update_docstrings_input_is_valid_file(mocker) -> None:
     os.environ["ANTHROPIC_API_KEY"] = "test_key"
     open("test_file.py", "w").close()
     mocker.patch.object(
@@ -135,7 +134,7 @@ async def test_update_docstrings_input_is_valid_file(mocker):
 
 
 @pytest.mark.asyncio
-async def test_update_docstrings_input_is_valid_directory(mocker):
+async def test_update_docstrings_input_is_valid_directory(mocker) -> None:
     os.environ["ANTHROPIC_API_KEY"] = "test_key"
     test_dir = tempfile.TemporaryDirectory()
     mocker.patch.object(
@@ -162,7 +161,7 @@ async def test_update_docstrings_input_is_valid_directory(mocker):
     test_dir.cleanup()
 
 
-def test_extract_exclude_list(mocker):
+def test_extract_exclude_list(mocker) -> None:
     """
     test_extract_exclude_list(mocker):
             Extract exclude list from a string.

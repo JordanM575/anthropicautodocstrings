@@ -11,17 +11,10 @@ import textwrap
 import typer
 from anthropic import AsyncAnthropic, HUMAN_PROMPT, AI_PROMPT
 from anthropic import (
-    APIError,
-    ConflictError,
-    NotFoundError,
-    APIStatusError,
     RateLimitError,
-    APITimeoutError,
 )
-import platform
 
-
-def set_env_variable_linux(var_name, value):
+def set_env_variable_linux(var_name, value) -> None:
     """
     set_env_variable_linux(var_name: str, value: str)
 
@@ -45,7 +38,7 @@ def set_env_variable_linux(var_name, value):
     )
 
 
-def set_env_variable_windows(var_name, value):
+def set_env_variable_windows(var_name, value) -> None:
     """
 
     def set_env_variable_windows(var_name: str, value: str):
@@ -62,32 +55,20 @@ def set_env_variable_windows(var_name, value):
                 None
     """
     os.system(f'set {var_name}="{value}"')
-
-
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-if not ANTHROPIC_API_KEY:
-    confirmation = input(
-        "ANTHROPIC_API_KEY not found. Would you like to enter it now? (yes or no) "
-    ).lower()
-    if confirmation == "yes":
-        ANTHROPIC_API_KEY = input("Please enter your ANTHROPIC_API_KEY: ")
-        os_type = platform.system().lower()
-        if os_type == "linux" or os_type == "debian":
-            set_env_variable_linux("ANTHROPIC_API_KEY", ANTHROPIC_API_KEY)
-            os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
-        elif os_type == "windows":
-            set_env_variable_windows("ANTHROPIC_API_KEY", ANTHROPIC_API_KEY)
-            os.environ["ANTHROPIC_API_KEY"] = ANTHROPIC_API_KEY
-        else:
-            print("Unrecognized system. Manually set the environment variable ANTHROPIC_API_KEY.")
-    else:
+try:
+    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+    anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+    if not ANTHROPIC_API_KEY:
         print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
         sys.exit(1)
-anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
+except Exception:
+    print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
+    sys.exit(1)
+
 BASE_DIR = ""
 
 
-async def generate_docstring(code_block: str, block_name: str):
+async def generate_docstring(code_block: str, block_name: str) -> str | None:
     stripped_code_block = textwrap.dedent(code_block)
     model = "claude-instant-1.2"
     prompt = f"""
@@ -287,7 +268,7 @@ async def main() -> None:
     )
 
 
-def run():
+def run() -> None:
     """
     run()
             Runs the main coroutine.
