@@ -93,4 +93,3 @@ Update the docstrings in all Python files in the my_code directory, but exlcude 
 ```console
 $ aads my_code/ --exclude-directories exclude_dir --exclude-files exclude_file_1.py,exclude_file_2.py
 ```
-
