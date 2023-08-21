@@ -16,12 +16,12 @@
     <a>
         <img src="https://img.shields.io/badge/python-3.11-blue.svg" alt="Python Version 3.11" height="18">
     </a>
-</p>
 
 [![Downloads](https://static.pepy.tech/badge/anthropicautodocstrings)](https://pepy.tech/project/anthropicautodocstrings)
 [![Downloads](https://static.pepy.tech/badge/anthropicautodocstrings/month)](https://pepy.tech/project/anthropicautodocstrings)
 [![Downloads](https://static.pepy.tech/badge/anthropicautodocstrings/week)](https://pepy.tech/project/anthropicautodocstrings)
 
+</p>
 Anthropicautodocstrings is a command-line tool with the following key features:
 
 * Updates the docstrings in Python files using the Anthropic API.
