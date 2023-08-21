@@ -43,7 +43,7 @@ jobs:
       - name: Create release
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
           script: |
             try {
               await github.rest.repos.createRelease({
