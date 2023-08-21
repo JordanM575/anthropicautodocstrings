@@ -1,3 +1,11 @@
+**Source Code**: <a href="https://github.com/JordanM575/anthropicautodocstrings" target="_blank">https://github.com/JordanM575/anthropicautodocstrings</a>
+
+<p align="center">
+<a href="https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/run_tests_and_report.yml" target="_blank">
+    <img src="https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/run_tests_and_report.yml/badge.svg" alt="Test">
+</a>
+
+
 Anthropicautodocstrings is a command-line tool with the following key features:
 
 * Updates the docstrings in Python files using the Anthropic API.
