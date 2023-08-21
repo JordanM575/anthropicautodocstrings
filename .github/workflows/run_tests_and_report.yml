@@ -5,13 +5,30 @@ on:
     branches: [main]
 jobs:
   tests:
-    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          python-version: [ "3.8", "3.9", "3.10", "3.11"]
+          os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
+      - name: Upgrade Pip
+        run: pip install --upgrade pip
+      - name: Upgrade requests Lib
+        run: pip install requests --upgrade
       - uses: actions/checkout@v3
       - name: Install Python
         uses: actions/setup-python@v4
-      - name: Install poetry
-        run: pip install -U poetry
+      - name: abatilo/actions-poetry@v2
+        run: pip install requests --upgrade
+      - name: Setup a local virtual environment (if no poetry.toml file)
+        run: |
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+      - uses: actions/cache@v3
+        name: Define a cache for the virtual environment based on the dependencies lock file
+        with:
+          path: ./.venv
+          key: venv-${{ hashFiles('poetry.lock') }}
       - name: Install the project dependencies
         run: poetry install
       - name: Run the automated tests (for example)
