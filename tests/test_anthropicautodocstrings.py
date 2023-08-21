@@ -2,15 +2,12 @@ import pytest
 import os
 import tempfile
 import sys
-import anthropicautodocstrings
-import anthropicautodocstrings.main
 from anthropicautodocstrings.main import (
     update_docstrings_in_directory,
     update_docstrings,
     _extract_exclude_list,
 )
 from unittest.mock import patch
-
 with patch("anthropicautodocstrings.main.sys.exit"):
     import anthropicautodocstrings.main
 
@@ -42,7 +39,7 @@ def setup_api_key():
         del os.environ["ANTHROPIC_API_KEY"]
 
 
-def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile:
+def create_test_file_with_docstring(docstring: str):
     """
     create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile
         Creates a temporary test file with the given docstring.
@@ -60,7 +57,7 @@ def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFi
     return test_file
 
 
-def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
+def create_test_file_with_constructor():
     """
     create_test_file_with_constructor()
 
