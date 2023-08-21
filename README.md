@@ -5,10 +5,8 @@
     <img src="https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/run_tests_and_report.yml/badge.svg" alt="Test">
 </a>
 <p align="center">
-<a href="https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/tag_and_release_package.yml" target="_blank">
-    <img src="https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/tag_and_release_package.yml/badge.svg" alt="Test">
-</a>
-
+[![release](https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/tag_and_release_package.yml/badge.svg)](https://github.com/JordanM575/anthropicautodocstrings/actions/workflows/tag_and_release_package.yml)
+</p>
 Anthropicautodocstrings is a command-line tool with the following key features:
 
 * Updates the docstrings in Python files using the Anthropic API.
