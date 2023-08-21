@@ -10,6 +10,23 @@ from anthropicautodocstrings.main import (
     _extract_exclude_list,
 )
 
+# Fixture to setup and cleanup API key
+@pytest.fixture(scope="function")
+def setup_api_key():
+    try:
+        # Check if ANTHROPIC_API_KEY is set, if not, it'll raise a KeyError
+        os.environ["ANTHROPIC_API_KEY"]
+    except KeyError:
+        # Set a fake API key if not found
+        os.environ["ANTHROPIC_API_KEY"] = "FAKE_API_KEY"
+    
+    # Provide the API key to the test function if needed
+    yield os.environ["ANTHROPIC_API_KEY"]
+    
+    # Cleanup after test (optional)
+    if os.environ["ANTHROPIC_API_KEY"] == "FAKE_API_KEY":
+        del os.environ["ANTHROPIC_API_KEY"]
+
 
 def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile:
     """
@@ -56,9 +73,9 @@ def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
     test_file.close()
     return test_file
 
-
 @pytest.mark.asyncio
-async def test_update_docstrings_in_directory(mocker):
+# Using the setup_api_key fixture
+async def test_update_docstrings_in_directory(mocker, setup_api_key: str) -> None:
     test_dir = tempfile.TemporaryDirectory()
     subdir_1 = os.path.join(test_dir.name, "subdir_1")
     os.makedirs(subdir_1)
