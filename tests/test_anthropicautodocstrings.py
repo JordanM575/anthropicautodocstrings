@@ -11,25 +11,33 @@ from anthropicautodocstrings.main import (
 )
 from unittest.mock import patch
 
-# Mock sys.exit so it doesn't interrupt the test session
-with patch('anthropicautodocstrings.main.sys.exit'):
+with patch("anthropicautodocstrings.main.sys.exit"):
     import anthropicautodocstrings.main
 
 
-# Fixture to setup and cleanup API key
 @pytest.fixture(scope="function")
 def setup_api_key():
+    """
+    setup_api_key()
+
+        Provides a test API key as a fixture for tests.
+
+        This fixture sets the ANTHROPIC_API_KEY environment variable to a fake key
+        before each test runs. After the test completes it deletes the variable if
+        it was the fake key. This ensures each test has a valid API key while keeping
+        tests isolated from real keys.
+
+        Raises:
+            KeyError: If the real API key is not already set in the environment.
+
+        Returns:
+            str: The API key usable within the test.
+    """
     try:
-        # Check if ANTHROPIC_API_KEY is set, if not, it'll raise a KeyError
         os.environ["ANTHROPIC_API_KEY"]
     except KeyError:
-        # Set a fake API key if not found
         os.environ["ANTHROPIC_API_KEY"] = "FAKE_API_KEY"
-    
-    # Provide the API key to the test function if needed
     yield os.environ["ANTHROPIC_API_KEY"]
-    
-    # Cleanup after test (optional)
     if os.environ["ANTHROPIC_API_KEY"] == "FAKE_API_KEY":
         del os.environ["ANTHROPIC_API_KEY"]
 
@@ -37,17 +45,13 @@ def setup_api_key():
 def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile:
     """
     create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFile
+        Creates a temporary test file with the given docstring.
 
-    Creates a temporary file containing a function with the given docstring. The file is returned as a NamedTemporaryFile instance.
+        Parameters:
+            docstring (str): The docstring to include in the test file
 
-    Parameters:
-        docstring: str
-            The docstring to include in the temporary file
-
-    Returns:
-            tempfile.NamedTemporaryFile
-                A file-like object representing the temporary file created, which must be closed by the caller.
-
+        Returns:
+            tempfile.NamedTemporaryFile: A named temporary file containing a function with the provided docstring
     """
     file_contents = f"\ndef foo():\n{docstring}\npass\n"
     test_file = tempfile.NamedTemporaryFile(mode="w", delete=False)
@@ -58,17 +62,20 @@ def create_test_file_with_docstring(docstring: str) -> tempfile.NamedTemporaryFi
 
 def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
     """
+    create_test_file_with_constructor()
 
-    def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
-        Create a test file with constructor.
-        Create a temporary NamedTemporaryFile to contain some file contents and return it without deleting.
+        Creates a temporary test file with a simple __init__ method defined.
+
         Parameters:
             None
+
         Returns:
-            tempfile.NamedTemporaryFile: Returns the test file object without deleting it.
+            tempfile.NamedTemporaryFile: A NamedTemporaryFile object representing the test file created.
+
         Raises:
             None
-        File_contents is written to a NamedTemporaryFile which is returned without deleting. This allows the contents to be accessed later for testing.
+
+        This function creates a temporary test file on disk with a basic empty __init__ method defined. It returns the NamedTemporaryFile object representing the file, without deleting it immediately. This allows the created test file to be used for testing purposes without needing to manually write and clean up the file.
     """
     file_contents = """
     def __init__():
@@ -79,8 +86,8 @@ def create_test_file_with_constructor() -> tempfile.NamedTemporaryFile:
     test_file.close()
     return test_file
 
+
 @pytest.mark.asyncio
-# Using the setup_api_key fixture
 async def test_update_docstrings_in_directory(mocker, setup_api_key: str) -> None:
     test_dir = tempfile.TemporaryDirectory()
     subdir_1 = os.path.join(test_dir.name, "subdir_1")
@@ -186,17 +193,20 @@ async def test_update_docstrings_input_is_valid_directory(mocker) -> None:
 
 def test_extract_exclude_list(mocker) -> None:
     """
-    test_extract_exclude_list(mocker):
-            Extract exclude list from a string.
+    test_extract_exclude_list(mocker: Mocker) -> None:
+       Extract a list of excluded file names from a comma separated string.
 
-            Arguments:
-                mocker: Mock object
+       Parameters:
+          mocker: Mock object using for testing
 
-            Returns:
-                list - List of excluded files
+       Returns:
+          None
 
-            Raises:
-                No exceptions
+       Examples:
+          assert _extract_exclude_list('') == []
+          assert _extract_exclude_list('test.py') == ['test.py']
+          assert _extract_extract_exclude_list('test1.py,test2.py,test3.py') == ['test1.py', 'test2.py', 'test3.py']
+          assert _extract_exclude_list(' test1.py , test2.py , test3.py ') == ['test1.py', 'test2.py', 'test3.py']
     """
     assert _extract_exclude_list("") == []
     assert _extract_exclude_list("test.py") == ["test.py"]
