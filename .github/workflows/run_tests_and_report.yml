@@ -8,18 +8,19 @@ jobs:
     strategy:
         matrix:
           python-version: [ "3.8", "3.9", "3.10", "3.11"]
+          poetry-version: ["1.5.1"]
           os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Upgrade Pip
-        run: pip install --upgrade pip
-      - name: Upgrade requests Lib
-        run: pip install requests --upgrade
       - uses: actions/checkout@v3
-      - name: Install Python
+      - name: Setup Python
         uses: actions/setup-python@v4
-      - name: abatilo/actions-poetry@v2
-        run: pip install requests --upgrade
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
       - name: Setup a local virtual environment (if no poetry.toml file)
         run: |
           poetry config virtualenvs.create true --local
