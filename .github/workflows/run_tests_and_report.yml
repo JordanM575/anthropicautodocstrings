@@ -11,7 +11,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
       - name: Install poetry
-        uses: pip install -U poetry
+        run: pip install -U poetry
       - name: Install the project dependencies
         run: poetry install
       - name: Run the automated tests (for example)
