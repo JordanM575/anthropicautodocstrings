@@ -5,11 +5,11 @@ import astor
 import os
 import sys
 import time
-from typing import List
+from typing import Dict, List
 import black
 import textwrap
 import typer
-from anthropic import AsyncAnthropic, HUMAN_PROMPT, AI_PROMPT
+from anthropic import AsyncAnthropic
 from anthropic import (
     RateLimitError,
 )
@@ -59,6 +59,12 @@ def set_env_variable_windows(var_name, value) -> None:
 
 BASE_DIR = ""
 
+def extract_text_from_content(content: List[Dict]) -> str:
+    text_content = "".join(
+        [block["text"] for block in content if block["type"] == "text"]
+    )
+    return text_content
+
 
 async def generate_docstring(code_block: str, block_name: str) -> str | None:
     try:
@@ -71,7 +77,7 @@ async def generate_docstring(code_block: str, block_name: str) -> str | None:
         print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
         sys.exit(1)
     stripped_code_block = textwrap.dedent(code_block)
-    model = "claude-instant-1.2"
+    model = "claude-3-haiku-20240307"
     prompt = f"""
     Make sure to include type or annotation for parameters and return values.
     Include exceptions, parameters, and return values.
@@ -110,13 +116,27 @@ async def generate_docstring(code_block: str, block_name: str) -> str | None:
     retries = 0
     while retries < max_retries:
         try:
-            completion = await anthropic.completions.create(
+            async with anthropic.messages.stream(
+                max_tokens=1024,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"{prompt}",
+                    }
+                ],
                 model=model,
-                max_tokens_to_sample=500,
-                prompt=f"{HUMAN_PROMPT}{prompt}{AI_PROMPT}",
-            )
-            output = completion.completion.strip()
-            return output
+            ) as stream:
+                async for text in stream.text_stream:
+                    print(text, end="", flush=True)
+                print()
+
+            message = await stream.get_final_message()
+            print(message.to_json())
+            if "content" in message: # type: ignore
+                text_content = extract_text_from_content(message["content"]) # type: ignore
+                print(text_content)
+            else:
+                print("No message content found")
         except RateLimitError:
             typer.secho(
                 "####### Anthropic rate limit reached, waiting for 1 minute #######",
