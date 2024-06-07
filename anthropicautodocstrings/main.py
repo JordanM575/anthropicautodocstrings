@@ -10,9 +10,8 @@ import black
 import textwrap
 import typer
 from anthropic import AsyncAnthropic
-from anthropic import (
-    RateLimitError,
-)
+from anthropic import RateLimitError
+
 
 def set_env_variable_linux(var_name, value) -> None:
     """
@@ -59,14 +58,29 @@ def set_env_variable_windows(var_name, value) -> None:
 
 BASE_DIR = ""
 
+
 def extract_text_from_content(content: List[Dict]) -> str:
+    """
+    extract_text_from_content(content: List[Dict]) -> str
+
+    Extract text content from a list of content blocks.
+
+    Parameters:
+    content (List[Dict]): A list of content block dictionaries.
+
+    Returns:
+    str: Concatenated text of blocks with type 'text'.
+
+    Raises:
+    None
+    """
     text_content = "".join(
         [block["text"] for block in content if block["type"] == "text"]
     )
     return text_content
 
 
-async def generate_docstring(code_block: str, block_name: str) -> str | None:
+async def generate_docstring(code_block: str, block_name: str) -> (str | None):
     try:
         ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
         anthropic = AsyncAnthropic(api_key=ANTHROPIC_API_KEY)
@@ -118,22 +132,16 @@ async def generate_docstring(code_block: str, block_name: str) -> str | None:
         try:
             async with anthropic.messages.stream(
                 max_tokens=1024,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"{prompt}",
-                    }
-                ],
+                messages=[{"role": "user", "content": f"{prompt}"}],
                 model=model,
             ) as stream:
                 async for text in stream.text_stream:
                     print(text, end="", flush=True)
                 print()
-
             message = await stream.get_final_message()
             print(message.to_json())
-            if "content" in message: # type: ignore
-                text_content = extract_text_from_content(message["content"]) # type: ignore
+            if "content" in message:
+                text_content = extract_text_from_content(message["content"])
                 print(text_content)
             else:
                 print("No message content found")

@@ -8,6 +8,7 @@ from anthropicautodocstrings.main import (
     _extract_exclude_list,
 )
 from unittest.mock import patch
+
 with patch("anthropicautodocstrings.main.sys.exit"):
     import anthropicautodocstrings.main
 
