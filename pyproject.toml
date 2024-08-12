@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anthropicautodocstrings"
-version = "0.0.6"
+version = "0.0.7"
 description = "Anthropic Auto Docstrings Generator"
 authors = ["Jordan McLaughlin <cantoo@duck.com>"]
 maintainers = ["Jordan McLaughlin <cantoo@duck.com>"]
