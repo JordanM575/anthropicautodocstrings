@@ -29,9 +29,15 @@ Anthropicautodocstrings is a command-line tool with the following key features:
 * Updates the docstrings in Python files using the Anthropic API.
 * Can process a single file or a directory of files, including all subdirectories.
 
-Anthropicautodocstrings uses the Anthropic API to generate docstrings, so these are not guaranteed to be perfect. The claude-3-haiku-20240307 model is used to generate the docstrings. This is the fastest. The version this was forked from is slow in comparison. To increase raw speed! This runs asyncronously.
+Anthropicautodocstrings uses the Anthropic API to generate docstrings, so these are not guaranteed to be perfect. The claude-3-5-haiku-20241022 model is used to generate the docstrings. This is the fastest. The version this was forked from is slow in comparison. To increase raw speed! This runs asyncronously.
 
 Anthropicautodocstrings will work best for code that already has good type hints. Without type hints, the Anthropic API will have to guess input and return types, which may not be accurate.
+
+---
+
+## Maintenance Note
+
+**This repository is still actively maintained**, however, the author no longer personally uses this tool due to the advent of modern AI-powered coding augmentation tools (like Cursor, GitHub Copilot, Claude Code, etc.) that provide real-time docstring generation and other enhanced coding features. The tool remains functional and will continue to receive updates for compatibility and bug fixes.
 
 ---
 
