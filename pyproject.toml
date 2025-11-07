@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "anthropicautodocstrings"
-version = "0.0.7"
+version = "0.0.8"
 description = "Anthropic Auto Docstrings Generator"
 authors = ["Jordan McLaughlin <cantoo@duck.com>"]
 maintainers = ["Jordan McLaughlin <cantoo@duck.com>"]
@@ -11,15 +11,16 @@ license = "GPL-3.0-or-later"
 [tool.poetry.dependencies]
 python = "^3.10"
 astor = "^0.8.1"
-anthropic = "^0.28.0"
-typer = "^0.12.3"
-black = "^24.4.2"
+anthropic = "^0.72.0"
+typer = "^0.20.0"
+black = "^25.9.0"
+certifi = "^2025.10.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-pytest-mock = "^3.11.1"
-pytest-cov = "^4.1.0"
-pytest-asyncio = "^0.21.1"
+pytest = "^8.4.0"
+pytest-mock = "^3.15.0"
+pytest-cov = "^7.0.0"
+pytest-asyncio = "^1.2.0"
 
 [tool.poetry.scripts]
 aads = 'anthropicautodocstrings.main:run'

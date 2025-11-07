@@ -87,14 +87,24 @@ async def generate_docstring(code_block: str, block_name: str) -> str:
         print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
         sys.exit(1)
     stripped_code_block = textwrap.dedent(code_block)
-    model = "claude-3-haiku-20240307"
+    model = "claude-haiku-4-5-20251001"
     prompt = f"""
-    You are a documentation assistant. Your task is to generate a concise and informative docstring 
-    for the following Python function. The docstring should include a summary of what the function does, 
-    a description of its parameters and their types, the return type, and any exceptions that it might raise.
+    You are a documentation assistant. Your task is to generate a concise and informative docstring
+    for the following Python function or method.
 
-    Please ensure that the response is strictly the docstring content without any additional text, 
-    code blocks, or conversational elements. Do not repeat the code block or include any commentary.
+    The docstring should include:
+    - A brief summary of what the function does
+    - A description of its parameters and their types (if applicable)
+    - The return type and what is returned (if applicable)
+    - Any exceptions that it might raise (if applicable)
+
+    IMPORTANT INSTRUCTIONS:
+    - Return ONLY the docstring text content itself
+    - Do NOT include the triple quotes in your response
+    - Do NOT include any code, function signatures, or the original function body
+    - Do NOT include markdown code blocks or formatting
+    - Do NOT include any conversational text, explanations, or commentary
+    - Do NOT remove or modify any existing code - you are only generating documentation text
 
     Here is the function to document:
 
@@ -165,11 +175,17 @@ async def update_docstrings_in_file(
             file_contents = f.read()
     if file_contents:
         tree = ast.parse(file_contents)
-        nodes = [
-            node
-            for node in ast.walk(tree)
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-        ]
+        # Only collect top-level functions and class methods, not nested functions
+        nodes = []
+        for node in tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                # Top-level function
+                nodes.append(node)
+            elif isinstance(node, ast.ClassDef):
+                # Methods within a class
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        nodes.append(item)
         for node in nodes:
             if (
                 isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
