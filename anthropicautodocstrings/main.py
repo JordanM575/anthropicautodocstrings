@@ -87,7 +87,7 @@ async def generate_docstring(code_block: str, block_name: str) -> str:
         print("Exiting, as ANTHROPIC_API_KEY is required for the program to run.")
         sys.exit(1)
     stripped_code_block = textwrap.dedent(code_block)
-    model = "claude-3-5-haiku-20241022"
+    model = "claude-haiku-4-5-20251001"
     prompt = f"""
     You are a documentation assistant. Your task is to generate a concise and informative docstring
     for the following Python function or method.
